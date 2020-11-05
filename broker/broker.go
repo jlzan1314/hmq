@@ -3,6 +3,7 @@ package broker
 import (
 	"crypto/tls"
 	"fmt"
+	acl "github.com/fhmq/hmq/plugins/auth/authfile"
 	"net"
 	"net/http"
 	"sync"
@@ -48,6 +49,11 @@ type Broker struct {
 	bridgeMQ    bridge.BridgeMQ
 }
 
+var(
+	currentBroker *Broker
+)
+
+
 func newMessagePool() []chan *Message {
 	pool := make([]chan *Message, 0)
 	for i := 0; i < MessagePoolNum; i++ {
@@ -92,8 +98,15 @@ func NewBroker(config *Config) (*Broker, error) {
 		b.tlsConfig = tlsconfig
 	}
 
-	b.auth = b.config.Plugin.Auth
+	if 	config.AclFile!="" {
+		b.SetAuth(acl.New(config.AclFile))
+	}else{
+		b.auth = b.config.Plugin.Auth
+	}
+
 	b.bridgeMQ = b.config.Plugin.Bridge
+
+	currentBroker=b
 
 	return b, nil
 }
@@ -110,7 +123,16 @@ func (b *Broker) SubmitWork(clientId string, msg *Message) {
 			ProcessMessage(msg)
 		})
 	}
+}
 
+func (b *Broker) SetAuth(auth auth.Auth) {
+	b.auth=auth
+}
+
+func ReloadAclAuth() {
+	if 	currentBroker.config.AclFile!="" {
+		currentBroker.SetAuth(acl.New(currentBroker.config.AclFile))
+	}
 }
 
 func (b *Broker) Start() {

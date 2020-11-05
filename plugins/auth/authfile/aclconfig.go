@@ -44,6 +44,8 @@ func AclConfigLoad(file string) (*ACLConfig, error) {
 	return aclconifg, err
 }
 
+
+
 func (c *ACLConfig) Prase() error {
 	f, err := os.Open(c.File)
 	defer f.Close()

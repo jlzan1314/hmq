@@ -5,7 +5,11 @@ type aclAuth struct {
 }
 
 func Init() *aclAuth {
-	aclConfig, err := AclConfigLoad("./plugins/auth/authfile/acl.conf")
+	return New("./plugins/auth/authfile/acl.conf")
+}
+
+func New(file string)*aclAuth  {
+	aclConfig, err := AclConfigLoad(file)
 	if err != nil {
 		panic(err)
 	}

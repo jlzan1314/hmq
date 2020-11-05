@@ -22,5 +22,10 @@ func InitHTTPMoniter(b *Broker) {
 		c.JSON(200, &resp)
 	})
 
+	router.GET("/reload", func(c *gin.Context) {
+		ReloadAclAuth()
+		c.Writer.WriteString("reload acl success");
+	});
+
 	router.Run(":" + b.config.HTTPPort)
 }

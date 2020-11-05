@@ -31,6 +31,7 @@ type Config struct {
 	TlsInfo  TLSInfo   `json:"tlsInfo"`
 	Debug    bool      `json:"debug"`
 	Plugin   Plugins   `json:"plugins"`
+	AclFile  string    `json:"aclFile"`
 }
 
 type Plugins struct {
@@ -98,6 +99,7 @@ func ConfigureConfig(args []string) (*Config, error) {
 	fs.StringVar(&config.WsPath, "wspath", "", "path for ws to listen on")
 	fs.StringVar(&configFile, "config", "", "config file for hmq")
 	fs.StringVar(&configFile, "c", "", "config file for hmq")
+	fs.StringVar(&config.AclFile, "acl", "", "config file for Acl")
 	fs.BoolVar(&config.Debug, "debug", false, "enable Debug logging.")
 	fs.BoolVar(&config.Debug, "d", false, "enable Debug logging.")
 
@@ -158,7 +160,6 @@ func LoadConfig(filename string) (*Config, error) {
 
 	return &config, nil
 }
-
 
 func (p *Plugins) UnmarshalJSON(b []byte) error {
 	var named NamedPlugins

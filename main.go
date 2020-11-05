@@ -1,16 +1,19 @@
 package main
 
 import (
+	"github.com/fhmq/hmq/broker"
 	"log"
 	"os"
 	"os/signal"
-	"runtime"
-
-	"github.com/fhmq/hmq/broker"
 )
 
 func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
+	mqttServerStart()
+	s := waitForSignal()
+	log.Println("signal received, broker closed.", s)
+}
+
+func mqttServerStart() {
 	config, err := broker.ConfigureConfig(os.Args[1:])
 	if err != nil {
 		log.Fatal("configure broker config error: ", err)
@@ -20,11 +23,10 @@ func main() {
 	if err != nil {
 		log.Fatal("New Broker error: ", err)
 	}
-	b.Start()
 
-	s := waitForSignal()
-	log.Println("signal received, broker closed.", s)
+	b.Start()
 }
+
 
 func waitForSignal() os.Signal {
 	signalChan := make(chan os.Signal, 1)
